@@ -1,4 +1,4 @@
-// Resultado da busca: quem postou, o texto e, para cada vídeo, a prévia e os links de baixar.
+// Resultado da busca: quem postou, o texto e, para cada vídeo, a prévia e os botões de baixar.
 import { api } from '../api.js';
 
 const resolucao = (v) => (v.largura && v.altura ? `${v.largura}×${v.altura}` : 'original');
@@ -17,15 +17,29 @@ function nomeDe(tweet, indice, variante) {
   return `xdl-${tweet.autor.usuario || 'tweet'}-${tweet.id}${n}${altura}.mp4`;
 }
 
-// Um botão de baixar por resolução.
-function link(tweet, indice, variante) {
+// Um botão de baixar por resolução. Enquanto o mp4 vem, o botão fica travado e mostra quanto
+// já chegou; no fim volta ao normal (ou mostra o erro, e volta ao normal no próximo clique).
+function botao(tweet, indice, variante) {
   const nome = nomeDe(tweet, indice, variante);
-  const a = document.createElement('a');
-  a.className = 'botao';
-  a.href = api.baixar(variante.url, nome);
-  a.download = nome;
-  a.textContent = `download .mp4 · ${resolucao(variante)}${mbps(variante)}`;
-  return a;
+  const rotulo = `download .mp4 · ${resolucao(variante)}${mbps(variante)}`;
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'botao';
+  b.textContent = rotulo;
+  b.addEventListener('click', async () => {
+    b.disabled = true;
+    b.textContent = 'downloading…';
+    try {
+      await api.baixar(variante.url, nome, (fracao) => {
+        b.textContent = fracao === null ? 'downloading…' : `downloading… ${Math.floor(fracao * 100)}%`;
+      });
+      b.textContent = rotulo;
+    } catch (erro) {
+      b.textContent = `${erro.message} · try again`;
+    }
+    b.disabled = false;
+  });
+  return b;
 }
 
 export function iniciarVideos({ secao, autor, texto, lista, modelo }) {
@@ -33,17 +47,22 @@ export function iniciarVideos({ secao, autor, texto, lista, modelo }) {
     const li = modelo.content.firstElementChild.cloneNode(true);
     const menor = video.variantes.at(-1);
 
-    // A prévia toca a menor variante; ela e o download passam pelo servidor.
+    // A prévia toca a menor variante direto do twimg (a página não manda Referer, ver o
+    // index.html). Se o navegador mandar mesmo assim e levar 403, ela vem pelo fetch, sem ele.
     const player = li.querySelector('video');
     if (video.capa) player.poster = video.capa;
-    player.src = api.ver(menor.url);
+    player.src = menor.url;
+    player.addEventListener('error', async () => {
+      const resposta = await fetch(menor.url, { referrerPolicy: 'no-referrer' }).catch(() => null);
+      if (resposta?.ok) player.src = URL.createObjectURL(await resposta.blob());
+    }, { once: true });
     if (video.tipo === 'gif') Object.assign(player, { loop: true, muted: true });
 
     const numero = tweet.videos.length > 1 ? `${indice + 1} of ${tweet.videos.length} · ` : '';
     li.querySelector('.video-titulo').textContent = `${numero}${video.tipo}${duracao(video.duracao)}`;
 
     // As variantes já vêm da melhor para a pior: a melhor é o primeiro botão.
-    li.querySelector('.variantes').replaceChildren(...video.variantes.map((v) => link(tweet, indice, v)));
+    li.querySelector('.variantes').replaceChildren(...video.variantes.map((v) => botao(tweet, indice, v)));
     return li;
   }
 

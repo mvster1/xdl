@@ -42,6 +42,8 @@ button:hover, .botao:hover { border-color: var(--destaque); }
 /* Clicado: o fundo pega a cor de destaque enquanto o botão está apertado. */
 button:active:not(:disabled), .botao:active { border-color: var(--destaque); background: color-mix(in srgb, var(--destaque) 20%, var(--fundo)); }
 button:disabled { color: var(--borda); cursor: default; }
+/* Botão de baixar travado enquanto o mp4 chega: segue azul, mostrando o progresso. */
+.variantes .botao:disabled { color: var(--destaque); cursor: progress; }
 :focus-visible { outline: 1px solid var(--destaque); outline-offset: 1px; }
 /* Link com cara de botão: os de baixar. */
 .botao { display: inline-block; text-decoration: none; }
