@@ -1,0 +1,100 @@
+/* Mesmas cores e mesma cara do solid: monoespaçada, bordas finas, sem enfeite. */
+:root {
+  color-scheme: light dark;
+  --fundo:    light-dark(#ffffff, #1f1f1e);
+  --texto:    light-dark(#1f2328, #d8d5ce);
+  --suave:    light-dark(#59636e, #aaa79f);
+  --borda:    light-dark(#b6bcc4, #4c4b48);
+  --destaque: light-dark(#1d5fa8, #8cb6d9);
+  --negativo: light-dark(#c5221f, #e58a80);
+}
+
+body {
+  font: 14px/1.5 monospace;
+  max-width: 100ch;
+  margin: 0 auto;
+  padding: 1rem;
+  background: var(--fundo);
+  color: var(--texto);
+}
+
+/* O que está com hidden some, tenha o display que tiver em qualquer regra (inclusive as do celular). */
+[hidden] { display: none !important; }
+header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: baseline; justify-content: space-between; }
+footer, label { color: var(--suave); }
+a { color: var(--destaque); }
+
+h1, h2 { font-size: 1em; }
+/* A linha fica em cima do resultado: quem postou e o texto vêm logo abaixo dela. */
+#resultado { margin-top: 2rem; padding-top: .5rem; border-top: 1px solid var(--borda); }
+h2 { margin: 0 0 .5rem; }
+ul { padding: 0; margin: 0; list-style: none; }
+
+input, button, .botao {
+  font: inherit;
+  color: var(--texto);
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  padding: .1rem .4rem;
+}
+button, .botao { cursor: pointer; }
+button:hover, .botao:hover { border-color: var(--destaque); }
+/* Clicado: o fundo pega a cor de destaque enquanto o botão está apertado. */
+button:active:not(:disabled), .botao:active { border-color: var(--destaque); background: color-mix(in srgb, var(--destaque) 20%, var(--fundo)); }
+button:disabled { color: var(--borda); cursor: default; }
+:focus-visible { outline: 1px solid var(--destaque); outline-offset: 1px; }
+/* Link com cara de botão: os de baixar. */
+.botao { display: inline-block; text-decoration: none; }
+/* Botões de baixar, em azul. */
+.variantes .botao { border-color: var(--destaque); color: var(--destaque); }
+
+/* Busca: o rótulo, o campo na largura toda e os botões embaixo. */
+#busca { display: grid; gap: .5rem; margin-top: 1rem; padding: .5rem; border: 1px solid var(--borda); }
+#busca input { width: 100%; box-sizing: border-box; }
+.botoes { display: flex; flex-wrap: wrap; gap: .5rem; }
+#msg { margin: 0; color: var(--suave); }
+#msg:empty { display: none; }
+
+#texto { margin: 0 0 .75rem; white-space: pre-line; overflow-wrap: anywhere; }
+
+/* Cada vídeo na sua caixa: a prévia à esquerda, os downloads à direita. */
+#videos { display: grid; gap: .75rem; }
+.video { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; padding: .5rem .6rem; border: 1px solid var(--borda); }
+.video video { width: 100%; max-height: 60vh; background: #000; }
+.video-info { display: flex; flex-direction: column; align-items: flex-start; gap: .5rem; min-width: 0; }
+.video-titulo { margin: 0; color: var(--suave); }
+.variantes { display: grid; justify-items: start; gap: .3rem; }
+
+footer { margin-top: 2rem; display: flex; justify-content: flex-end; align-items: baseline; gap: 1rem; }
+
+/* ---------------------------------------------------------------------------
+   Celular (telas de até 720px de largura). Tudo numa coluna só e os controles
+   ganham altura para o dedo.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px), (pointer: coarse) and (max-height: 500px) {
+  /* A área usável é a que o navegador deixa: descontam-se o entalhe, os cantos e a barra de
+     gestos (safe-area), e as alturas vêm da janela visível de verdade (dvh). */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body {
+    font-size: 16px; min-height: 100dvh; box-sizing: border-box;
+    display: flex; flex-direction: column;
+    padding: max(.75rem, env(safe-area-inset-top)) max(.75rem, env(safe-area-inset-right)) max(.75rem, env(safe-area-inset-bottom)) max(.75rem, env(safe-area-inset-left));
+  }
+  main { flex: 1; }
+  button, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+  /* Alvos de toque: pelo menos 44px de altura. O iOS arredonda campos e botões do jeito
+     dele; aqui seguem o resto do app. */
+  input, button, .botao { min-height: 44px; padding: .4rem .7rem; box-sizing: border-box; }
+  input, button { -webkit-appearance: none; appearance: none; border-radius: 0; }
+  .botao { display: flex; align-items: center; justify-content: center; text-align: center; }
+
+  .botoes button { flex: 1; }
+  .video { grid-template-columns: 1fr; gap: .6rem; }
+  .video-info { align-items: stretch; }
+  .variantes .botao { width: 100%; }
+
+  footer { flex-direction: column; gap: .6rem; align-items: stretch; }
+  #acoes { display: flex; }
+  #acoes button { flex: 1; }
+}

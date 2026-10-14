@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- O twimg recusa (403) vídeo pedido com Referer de outro site: a prévia sai sem ele. -->
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="download twitter videos and gifs as .mp4">
+  <title>xdl</title>
+  <link rel="stylesheet" href="css/styles.css?v=1">
+</head>
+<body>
+  <header>
+    <h1>xdl</h1>
+  </header>
+
+  <main>
+    <form id="busca">
+      <input id="link" name="url" aria-label="tweet link" required autocomplete="off" autocapitalize="off" spellcheck="false"
+             inputmode="url" enterkeyhint="go" placeholder="tweet link">
+      <div class="botoes">
+        <button type="submit">search</button>
+      </div>
+      <p id="msg"></p>
+    </form>
+
+    <section id="resultado" hidden>
+      <h2 id="autor"></h2>
+      <p id="texto"></p>
+      <ul id="videos"></ul>
+    </section>
+  </main>
+
+  <!-- Um vídeo do tweet: a prévia e um botão de baixar por resolução, da melhor para a pior. -->
+  <template id="modelo-video">
+    <li class="video">
+      <video controls playsinline preload="none"></video>
+      <div class="video-info">
+        <p class="video-titulo"></p>
+        <div class="variantes"></div>
+      </div>
+    </li>
+  </template>
+
+  <footer>
+    <span id="acoes">
+      <button type="button" id="tema"></button>
+    </span>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
